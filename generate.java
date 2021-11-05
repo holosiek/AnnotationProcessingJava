@@ -111,8 +111,8 @@ public class GeneratedEndpoints implements HttpHandler
 		}
 		else
 		{
-			response = "{\"serverCode\": " + httpAnswer.httpCode + ", \"response\": " + httpAnswer.json + "}";
-			t.sendResponseHeaders(httpAnswer.httpCode, response.length());
+			response = "{\"serverCode\": " + httpAnswer.httpCode() + ", \"response\": " + httpAnswer.json() + "}";
+			t.sendResponseHeaders(httpAnswer.httpCode(), response.length());
 		}
 		System.out.println("Processing:\n" + "Uri: " + uri + "\t\tMethod: " + requestMethod + "\t\tBody: " + requestData + "\nResponse: " + response + "\n-------------------------");
 		
