@@ -16,7 +16,7 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 
 public class GeneratedEndpoints implements HttpHandler
-{	
+{
 	private int getIntType(String path, String[] splittedUri, String parameterName)
 	{
 		path = path + "/";
@@ -111,7 +111,7 @@ public class GeneratedEndpoints implements HttpHandler
 		}
 		else
 		{
-			response = "{\"serverCode\": " + httpAnswer.httpCode + ", \"response\": \"" + httpAnswer.json + "\"}";
+			response = "{\"serverCode\": " + httpAnswer.httpCode + ", \"response\": " + httpAnswer.json + "}";
 			t.sendResponseHeaders(httpAnswer.httpCode, response.length());
 		}
 		System.out.println("Processing:\n" + "Uri: " + uri + "\t\tMethod: " + requestMethod + "\t\tBody: " + requestData + "\nResponse: " + response + "\n-------------------------");
