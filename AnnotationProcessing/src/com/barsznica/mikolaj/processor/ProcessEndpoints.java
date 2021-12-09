@@ -1,13 +1,15 @@
 package com.barsznica.mikolaj.processor;
 
+import com.barsznica.mikolaj.commonap.*;
+
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -181,6 +183,18 @@ public class ProcessEndpoints extends AbstractProcessor {
         return stringBuilder.toString();
     }
 
+    private String getTemplateData() throws IOException
+    {
+        var templateInputStream = getClass().getClassLoader().getResourceAsStream("template.txt");
+
+        if (templateInputStream == null)
+        {
+            messager.printMessage(Diagnostic.Kind.ERROR, "Cannot find template.txt file");
+            return null;
+        }
+        return new String(templateInputStream.readAllBytes(), StandardCharsets.UTF_8);
+    }
+
     private void generateFile(String packageName, String stringBuilder)
     {
         if (packageName != null)
@@ -188,10 +202,17 @@ public class ProcessEndpoints extends AbstractProcessor {
             try
             {
                 String sourceFilename = packageName + "." + "GeneratedEndpoints";
-                var file = processingEnv.getFiler().createSourceFile(sourceFilename).openWriter();
-                file.write("package \n" + packageName + ";\n" + "import com.barsznica.mikolaj.processor.*;\n" + "import com.sun.net.httpserver.Headers;\n" + "import com.sun.net.httpserver.HttpExchange;\n" + "import com.sun.net.httpserver.HttpHandler;\n" + "import com.sun.net.httpserver.HttpServer;\n" + "import java.io.BufferedReader;\n" + "import java.io.InputStreamReader;\n" + "import java.io.IOException;\n" + "import java.io.OutputStream;\n" + "import java.util.Map;\n" + "import java.util.LinkedHashMap;\n" + "import java.net.InetSocketAddress;\n" + "import java.nio.charset.StandardCharsets;\n" + "\n" + "public class GeneratedEndpoints implements HttpHandler\n" + "{\n" + "\tprivate int getIntType(String path, String[] splittedUri, String parameterName)\n" + "\t{\n" + "\t\tpath = path + \"/\";\n" + "\t\tvar splittedPath = path.split(\"/\");\n" + "\t\tparameterName = \"{\" + parameterName + \"}\";\n" + "\t\t\n" + "\t\tfor (var i=0; i<splittedPath.length; i++)\n" + "        {\n" + "            if (splittedPath[i].equals(parameterName))\n" + "            {\n" + "\t\t\t\tint num = 0;\n" + "\t\t\t\ttry {\n" + "\t\t\t\t\tnum = Integer.parseInt(splittedUri[i]);\n" + "\t\t\t\t}\n" + "\t\t\t\tcatch (NumberFormatException ex){\n" + "\t\t\t\t\tex.printStackTrace();\n" + "\t\t\t\t}\n" + "\t\t\t\treturn num;\n" + "            }\n" + "        }\n" + "\t\t\n" + "\t\treturn 0;\n" + "\t}\n" + "\t\n" + "\tprivate String getStringType(String path, String[] splittedUri, String parameterName)\n" + "\t{\n" + "\t\tpath = path + \"/\";\n" + "\t\tvar splittedPath = path.split(\"/\");\n" + "\t\tparameterName = \"{\" + parameterName + \"}\";\n" + "\t\t\n" + "\t\tfor (var i=0; i<splittedPath.length; i++)\n" + "        {\t\t\t\n" + "            if (splittedPath[i].equals(parameterName))\n" + "            {\n" + "\t\t\t\treturn splittedUri[i];\n" + "            }\n" + "        }\n" + "\t\t\n" + "\t\treturn null;\n" + "\t}\n" + "\t\n" + "\tprivate boolean isPathRight(String path, String[] splittedUri)\n" + "    {\n" + "\t\tpath = path + \"/\";\n" + "\t\tvar splittedPath = path.split(\"/\");\n" + "\t\t\n" + "        if (splittedPath.length != splittedUri.length)\n" + "        {\n" + "\t\t\treturn false;\n" + "        }\n" + "\n" + "        for (var i=0; i<splittedPath.length; i++)\n" + "        {\t\n" + "            if (!splittedPath[i].equals(splittedUri[i]) && splittedPath[i].length() > 0 && splittedPath[i].charAt(0) != '{')\n" + "            {\n" + "                return false;\n" + "            }\n" + "        }\n" + "\n" + "        return true;\n" + "    }\n" + "\t\n" + "\t@Override\n" + "\tpublic void handle(HttpExchange t) throws IOException\n" + "\t{\n" + "\t\tString uri = t.getRequestURI().toString();\n" + "\t\tvar splittedUri = uri.split(\"/\");\n" + "\t\tHttpAnswer httpAnswer = null;\n" + "\t\tvar isr = new InputStreamReader(t.getRequestBody(),\"utf-8\");\n" + "\t\tvar br = new BufferedReader(isr);\n" + "\t\tvar buf = new StringBuilder();\n" + "\t\tint b;\n" + "\t\twhile ((b = br.read()) != -1)\n" + "\t\t{\n" + "\t\t\tbuf.append((char) b);\n" + "\t\t}\n" + "\t\tbr.close();\n" + "\t\tisr.close();\n" + "\t\tString requestData = buf.toString();\n" + "\t\tString requestMethod = t.getRequestMethod();\n" + stringBuilder + "\t\t\n" + "\t\tHeaders headers = t.getResponseHeaders();\n" + "\t\tString response;\n" + "\t\theaders.set(\"Content-Type\", String.format(\"application/json; charset=%s\", StandardCharsets.UTF_8));\n" + "\t\t\n" + "\t\tif (httpAnswer == null)\n" + "\t\t{\n" + "\t\t\tresponse = \"{\\\"serverCode\\\": 404, \\\"response\\\": \\\"Invalid request\\\"}\";\n" + "\t\t\tt.sendResponseHeaders(404, response.length());\n" + "\n" + "\t\t}\n" + "\t\telse\n" + "\t\t{\n" + "\t\t\tresponse = \"{\\\"serverCode\\\": \" + httpAnswer.httpCode() + \", \\\"response\\\": \" + httpAnswer.json() + \"}\";\n" + "\t\t\tt.sendResponseHeaders(httpAnswer.httpCode(), response.length());\n" + "\t\t}\n" + "\t\tSystem.out.println(\"Processing:\\n\" + \"Uri: \" + uri + \"\\t\\tMethod: \" + requestMethod + \"\\t\\tBody: \" + requestData + \"\\nResponse: \" + response + \"\\n-------------------------\");\n" + "\t\t\n" + "\t\tOutputStream os = t.getResponseBody();\n" + "\t\tos.write(response.getBytes());\n" + "\t\tos.close();\n" + "\t}\n" + "}\n" + "\n");
-                file.flush();
-                file.close();
+                String content = getTemplateData();
+
+                if (content != null)
+                {
+                    content = content.replaceAll("##package##", sourceFilename);
+                    content = content.replaceAll("##endpoints##", stringBuilder);
+                    var file = processingEnv.getFiler().createSourceFile(sourceFilename).openWriter();
+                    file.write(content.toString());
+                    file.flush();
+                    file.close();
+                }
             }
             catch (IOException ex)
             {

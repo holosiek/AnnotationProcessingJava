@@ -1,4 +1,4 @@
-package com.barsznica.mikolaj.processor;
+package com.barsznica.mikolaj.commonap;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

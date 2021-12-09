@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/AnnotationsPreprocessor.iml" filepath="$PROJECT_DIR$/AnnotationsPreprocessor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AnnotationProcessing/AnnotationProcessing.iml" filepath="$PROJECT_DIR$/AnnotationProcessing/AnnotationProcessing.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AnnotationProcessingJava.iml" filepath="$PROJECT_DIR$/AnnotationProcessingJava.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CommonAP/CommonAP.iml" filepath="$PROJECT_DIR$/CommonAP/CommonAP.iml" />
     </modules>
   </component>
 </project>
