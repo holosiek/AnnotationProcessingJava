@@ -1,4 +1,6 @@
 package ##package##;
+
+import com.barsznica.mikolaj.commonap.*;
 import com.barsznica.mikolaj.processor.*;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
