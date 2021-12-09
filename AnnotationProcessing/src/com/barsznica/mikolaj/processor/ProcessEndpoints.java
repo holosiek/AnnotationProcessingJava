@@ -206,7 +206,7 @@ public class ProcessEndpoints extends AbstractProcessor {
 
                 if (content != null)
                 {
-                    content = content.replaceAll("##package##", sourceFilename);
+                    content = content.replaceAll("##package##", packageName);
                     content = content.replaceAll("##endpoints##", stringBuilder);
                     var file = processingEnv.getFiler().createSourceFile(sourceFilename).openWriter();
                     file.write(content.toString());
