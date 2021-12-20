@@ -165,22 +165,45 @@ public class ProcessEndpoints extends AbstractProcessor {
                     }
                     if (typeOfParameter.getKind() == TypeKind.INT)
                     {
-                        parametersBuilder.append("getIntType(\"" + path + "\", splittedUri, \"" + parameterName + "\")");
+                        parametersBuilder.append("getIntType(\"")
+                                .append(path)
+                                .append("\", splittedUri, \"")
+                                .append(parameterName)
+                                .append("\")");
                     }
                     else
                     {
-                        parametersBuilder.append("getStringType(\"" + path + "\", splittedUri, \"" + parameterName + "\")");
+                        parametersBuilder.append("getStringType(\"")
+                                .append(path)
+                                .append("\", splittedUri, \"")
+                                .append(parameterName)
+                                .append("\")");
                     }
                     firstTime = false;
                 }
             }
 
+            String normalizedClassName = normalizeClassName(className);
             String requestData = (method.equals("PUT") || method.equals("POST")) ? "requestData" : "";
-            String openingBracket = !method.equals("GET") ? "synchronized(" + normalizeClassName(className) + "){" : "";
+            String openingBracket = !method.equals("GET") ? "synchronized(" + normalizedClassName + "){" : "";
             String closingBracket = !method.equals("GET") ? "}" : "";
             String parameters = parametersBuilder + (!firstTime && !requestData.equals("") ? ", " : "") + requestData;
 
-            stringBuilder.append("if (isPathRight(\"" + path + "\", splittedUri) && requestMethod.equals(\""+method+"\")){\n"+openingBracket+"\thttpAnswer = "+normalizeClassName(className)+"."+endpointMethod+"(" + parameters + ");\n" + closingBracket + "}");
+            stringBuilder.append("if (isPathRight(\"")
+                    .append(path)
+                    .append("\", splittedUri) && requestMethod.equals(\"")
+                    .append(method)
+                    .append("\")){\n")
+                    .append(openingBracket)
+                    .append("\thttpAnswer = ")
+                    .append(normalizedClassName)
+                    .append(".")
+                    .append(endpointMethod)
+                    .append("(")
+                    .append(parameters)
+                    .append(");\n")
+                    .append(closingBracket)
+                    .append("}");
         }
 
         return stringBuilder.toString();
@@ -255,7 +278,11 @@ public class ProcessEndpoints extends AbstractProcessor {
             if (!classes.contains(elementClassName))
             {
                 classes.add(elementClassName);
-                classesBuilder.append("var ").append(normalizeClassName(elementClassName)).append(" = new ").append(elementClassName).append("();\n");
+                classesBuilder.append("var ")
+                        .append(normalizeClassName(elementClassName))
+                        .append(" = new ")
+                        .append(elementClassName)
+                        .append("();\n");
             }
 
             processBody(element);
