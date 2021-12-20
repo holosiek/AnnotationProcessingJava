@@ -10,7 +10,9 @@ import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 public class ProcessEndpoints extends AbstractProcessor {
@@ -174,10 +176,11 @@ public class ProcessEndpoints extends AbstractProcessor {
             }
 
             String requestData = (method.equals("PUT") || method.equals("POST")) ? "requestData" : "";
-            String methodName = className + "." + endpointMethod;
+            String openingBracket = !method.equals("GET") ? "synchronized(" + normalizeClassName(className) + "){" : "";
+            String closingBracket = !method.equals("GET") ? "}" : "";
             String parameters = parametersBuilder + (!firstTime && !requestData.equals("") ? ", " : "") + requestData;
 
-            stringBuilder.append("if (isPathRight(\"" + path + "\", splittedUri) && requestMethod.equals(\""+method+"\")){\n\thttpAnswer = "+methodName+"(" + parameters + ");\n}");
+            stringBuilder.append("if (isPathRight(\"" + path + "\", splittedUri) && requestMethod.equals(\""+method+"\")){\n"+openingBracket+"\thttpAnswer = "+normalizeClassName(className)+"."+endpointMethod+"(" + parameters + ");\n" + closingBracket + "}");
         }
 
         return stringBuilder.toString();
@@ -221,18 +224,38 @@ public class ProcessEndpoints extends AbstractProcessor {
         }
     }
 
+    public String getElementClass(Element element)
+    {
+        return ((TypeElement)element.getEnclosingElement()).getQualifiedName().toString();
+    }
+
+    private String normalizeClassName(String className)
+    {
+        return className.replaceAll("\\.", "");
+    }
+
     @Override
     public boolean process(Set<? extends TypeElement> annoations, RoundEnvironment env)
     {
         var endpointHandlerBuilder = new StringBuilder();
+        var classesBuilder = new StringBuilder();
+        var classes = new ArrayList<String>();
         String packageName = null;
         boolean firstTime = true;
         
         for (var element : env.getElementsAnnotatedWith(Endpoint.class))
         {
+            String elementClassName = getElementClass(element);
+
             if (!firstTime)
             {
                 endpointHandlerBuilder.append("\nelse ");
+            }
+
+            if (!classes.contains(elementClassName))
+            {
+                classes.add(elementClassName);
+                classesBuilder.append("var ").append(normalizeClassName(elementClassName)).append(" = new ").append(elementClassName).append("();\n");
             }
 
             processBody(element);
@@ -246,6 +269,7 @@ public class ProcessEndpoints extends AbstractProcessor {
             endpointHandlerBuilder.append(getEndpoint(element));
         }
 
+        endpointHandlerBuilder.insert(0, classesBuilder);
         generateFile(packageName, endpointHandlerBuilder.toString());
 
         return true;

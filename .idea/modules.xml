@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/AnnotationProcessing/AnnotationProcessing.iml" filepath="$PROJECT_DIR$/AnnotationProcessing/AnnotationProcessing.iml" />
       <module fileurl="file://$PROJECT_DIR$/AnnotationProcessingJava.iml" filepath="$PROJECT_DIR$/AnnotationProcessingJava.iml" />
       <module fileurl="file://$PROJECT_DIR$/CommonAP/CommonAP.iml" filepath="$PROJECT_DIR$/CommonAP/CommonAP.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Server/Server.iml" filepath="$PROJECT_DIR$/Server/Server.iml" />
     </modules>
   </component>
 </project>
